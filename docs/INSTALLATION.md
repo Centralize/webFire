@@ -95,3 +95,22 @@ Notes:
 - Backend binds directly to the host at `0.0.0.0:8000`.
 - Nginx proxies to `http://host.docker.internal:8000` (Linux support added via `extra_hosts`).
 - Managing `ufw` now affects the host firewall. Proceed with caution.
+
+### Configure UFW to work with Docker
+
+UFW can block Docker traffic unless you allow forwarding for Docker bridges. A helper script is provided:
+
+```bash
+sudo ./scripts/configure_ufw_for_docker.sh
+```
+
+This will:
+- Set `DEFAULT_FORWARD_POLICY="ACCEPT"` in `/etc/default/ufw`
+- Add permissive forward rules for `docker0` and `br-*` to `/etc/ufw/after.rules`
+- Keep NAT commented (Docker handles NAT). You can enable it in the block if needed.
+
+Reload UFW afterward:
+
+```bash
+sudo ufw reload
+```
