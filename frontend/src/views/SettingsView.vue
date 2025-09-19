@@ -1,14 +1,34 @@
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Settings</h1>
-    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-      <h2 class="text-xl font-bold mb-4">UFW Control</h2>
-      <button @click="enableUfw" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">
-        Enable UFW
-      </button>
-      <button @click="disableUfw" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-        Disable UFW
-      </button>
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="h2 mb-4">
+          <i class="bi bi-gear me-2"></i>Settings
+        </h1>
+        
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-shield me-2"></i>UFW Control
+            </h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted mb-4">
+              Control the UFW firewall service. Use with caution as incorrect configuration may disconnect your session.
+            </p>
+            <div class="d-flex gap-3">
+              <button @click="enableUfw" class="btn btn-success">
+                <i class="bi bi-shield-check me-1"></i>
+                Enable UFW
+              </button>
+              <button @click="disableUfw" class="btn btn-danger">
+                <i class="bi bi-shield-x me-1"></i>
+                Disable UFW
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -19,7 +39,7 @@ import axios from '../api/axios';
 const enableUfw = async () => {
   if (confirm('Are you sure you want to ENABLE UFW? This might disconnect you if not configured correctly.')) {
     try {
-      const response = await axios.post('http://localhost:8000/api/enable');
+      const response = await axios.post('/enable');
       if (response.data.status === 'success') {
         alert('UFW enabled successfully!');
       } else {
@@ -35,7 +55,7 @@ const enableUfw = async () => {
 const disableUfw = async () => {
   if (confirm('Are you sure you want to DISABLE UFW? This will open all ports.')) {
     try {
-      const response = await axios.post('http://localhost:8000/api/disable');
+      const response = await axios.post('/disable');
       if (response.data.status === 'success') {
         alert('UFW disabled successfully!');
       } else {

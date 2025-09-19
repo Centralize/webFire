@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-vh-100 d-flex flex-column">
     <header>
       <slot name="header"></slot>
     </header>
-    <main class="flex-grow">
+    <main class="flex-grow-1">
       <slot></slot>
     </main>
-    <footer>
+    <footer class="mt-auto">
       <slot name="footer"></slot>
     </footer>
   </div>

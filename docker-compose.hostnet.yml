@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  backend:
+    network_mode: host
+    # No ports mapping with host networking; service binds directly to host ports
+    volumes:
+      - ./backend:/app
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    security_opt:
+      - no-new-privileges:false
+    environment:
+      PYTHONUNBUFFERED: 1
+      SECRET_KEY: "your-super-secret-key-for-development" # Change this in production!
+
+  nginx:
+    volumes:
+      - ./nginx/nginx.hostnet.conf:/etc/nginx/nginx.conf:ro
+    # Allow Nginx to reach the host backend via host.docker.internal on Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - backend
+

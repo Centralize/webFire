@@ -52,9 +52,12 @@ Once the containers are up and running, you can access webFire:
 
 ## 5. Initial Login (Development)
 
-**Important Note:** For security hardening purposes, the authentication system is currently **temporarily disabled** in the development setup. Attempting to log in will result in an error.
+Authentication is enabled for development.
 
-To enable full functionality, you will need to implement a proper user management system (e.g., integrate with a database for user storage and authentication). Refer to the `backend/main.py` and `backend/auth.py` files for `TODO` comments on where to integrate this.
+- Username: `admin`
+- Password: `secret`
+
+The backend issues JWTs at `/api/token` and protects all `/api/*` endpoints. Change the credentials and `SECRET_KEY` before any real deployment.
 
 ## 6. Stopping the Application
 
@@ -69,3 +72,26 @@ To remove all volumes created by `docker compose up`, including the frontend bui
 ```bash
 docker compose down -v
 ```
+
+## 7. UFW: container vs host firewall
+
+The backend image includes `ufw` and required networking tools, and the container is granted `NET_ADMIN` and `NET_RAW` capabilities. This allows testing UFW commands inside the container.
+
+Important: Managing `ufw` inside the container affects the container's network namespace, not the host firewall. For host-level firewall management, you would need to run the backend with host networking and additional privileges, and adjust Nginx accordingly. This is an advanced setup and should be done with caution.
+
+If you want, create a compose override to run the backend with `network_mode: host` and proxy Nginx to `127.0.0.1:8000`.
+
+### Use host networking (advanced)
+
+An override file `docker-compose.hostnet.yml` is provided to run the backend on the host network and proxy Nginx to the host backend.
+
+Start with the override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.hostnet.yml up --build
+```
+
+Notes:
+- Backend binds directly to the host at `0.0.0.0:8000`.
+- Nginx proxies to `http://host.docker.internal:8000` (Linux support added via `extra_hosts`).
+- Managing `ufw` now affects the host firewall. Proceed with caution.

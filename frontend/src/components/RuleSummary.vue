@@ -1,9 +1,30 @@
 <template>
-  <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    <h2 class="text-xl font-bold mb-4">Rule Summary</h2>
-    <p>Total Rules: {{ rules.length }}</p>
-    <p>Allow Rules: {{ allowRulesCount }}</p>
-    <p>Deny Rules: {{ denyRulesCount }}</p>
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        <i class="bi bi-bar-chart me-2"></i>Rule Summary
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row text-center">
+        <div class="col-md-4">
+          <div class="border-end">
+            <h3 class="text-primary mb-1">{{ rules.length }}</h3>
+            <p class="text-muted mb-0">Total Rules</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="border-end">
+            <h3 class="text-success mb-1">{{ allowRulesCount }}</h3>
+            <p class="text-muted mb-0">Allow Rules</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h3 class="text-danger mb-1">{{ denyRulesCount }}</h3>
+          <p class="text-muted mb-0">Deny Rules</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -18,11 +39,11 @@ const props = defineProps({
 });
 
 const allowRulesCount = computed(() => {
-  return props.rules.filter(rule => rule.Action && rule.Action.includes('ALLOW')).length;
+  return props.rules.filter(rule => rule.action && String(rule.action).toUpperCase().includes('ALLOW')).length;
 });
 
 const denyRulesCount = computed(() => {
-  return props.rules.filter(rule => rule.Action && rule.Action.includes('DENY')).length;
+  return props.rules.filter(rule => rule.action && String(rule.action).toUpperCase().includes('DENY')).length;
 });
 </script>
 

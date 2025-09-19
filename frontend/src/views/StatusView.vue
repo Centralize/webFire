@@ -1,21 +1,62 @@
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">UFW Status</h1>
-    <div v-if="status.status === 'active'" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-      <strong class="font-bold">UFW is Active!</strong>
-      <span class="block sm:inline">Your firewall is currently enabled.</span>
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="h2 mb-4">
+          <i class="bi bi-shield-check me-2"></i>UFW Status
+        </h1>
+        
+        <!-- Loading State -->
+        <div v-if="status.status === 'loading'" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Checking UFW status...</p>
+        </div>
+        
+        <!-- Status Alerts -->
+        <div 
+          v-else-if="status.status === 'active'" 
+          class="alert alert-success d-flex align-items-center mb-4"
+          role="alert"
+        >
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <div>
+            <strong>UFW is Active!</strong>
+            <span class="d-block d-sm-inline">Your firewall is currently enabled and protecting your system.</span>
+          </div>
+        </div>
+        
+        <div 
+          v-else-if="status.status === 'inactive'" 
+          class="alert alert-danger d-flex align-items-center mb-4"
+          role="alert"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>
+            <strong>UFW is Inactive!</strong>
+            <span class="d-block d-sm-inline">Your firewall is currently disabled.</span>
+          </div>
+        </div>
+        
+        <div 
+          v-else 
+          class="alert alert-warning d-flex align-items-center mb-4"
+          role="alert"
+        >
+          <i class="bi bi-question-circle-fill me-2"></i>
+          <div>
+            <strong>UFW Status Unknown!</strong>
+            <span class="d-block d-sm-inline">{{ status.message }}</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div v-else-if="status.status === 'inactive'" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <strong class="font-bold">UFW is Inactive!</strong>
-      <span class="block sm:inline">Your firewall is currently disabled.</span>
-    </div>
-    <div v-else class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
-      <strong class="font-bold">UFW Status Unknown!</strong>
-      <span class="block sm:inline">Could not determine UFW status. {{ status.message }}</span>
-    </div>
-
-    <div class="mt-8">
-      <RuleSummary :rules="rules" />
+    
+    <div class="row mt-4">
+      <div class="col-12">
+        <RuleSummary :rules="rules" />
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +71,7 @@ const rules = ref([]);
 
 const fetchUfwStatus = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/status');
+    const response = await axios.get('/status');
     status.value = response.data;
   } catch (error) {
     console.error('Error fetching UFW status:', error);
@@ -40,7 +81,7 @@ const fetchUfwStatus = async () => {
 
 const fetchUfwRules = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/rules');
+    const response = await axios.get('/rules');
     rules.value = response.data.rules;
   } catch (error) {
     console.error('Error fetching UFW rules:', error);

@@ -1,16 +1,18 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
+// Prefer proxy via Nginx at /api in production; allow override for dev via Vite env
+const baseURL = import.meta?.env?.VITE_API_BASE_URL || '/api';
 const instance = axios.create({
-  baseURL: 'http://localhost:8000', // Your backend API base URL
-  timeout: 5000, // Request timeout
+  baseURL,
+  timeout: 5000,
 });
 
 // Request interceptor to add the auth token
 instance.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore();
-    if (authStore.token) {
+    if (authStore?.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`;
     }
     return config;

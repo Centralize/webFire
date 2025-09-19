@@ -12,7 +12,7 @@ typing-inspection==0.4.1
 typing_extensions==4.15.0
 uvicorn==0.35.0
 python-jose[cryptography]
-passlib[bcrypt]
+passlib
 pytest
 httpx
 python-multipart

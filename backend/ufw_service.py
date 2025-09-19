@@ -31,94 +31,70 @@ def get_ufw_status():
 
 def get_ufw_rules():
     """
-    Gets the rules from UFW.
+    Gets the rules from UFW in a structured format compatible with the frontend.
 
     Returns:
-        dict: A dictionary containing the UFW rules.
+        dict: {"status": str, "rules": [{"id": int, "to": str, "action": str, "direction": str, "from": str}]}
     """
     # WARNING: This function executes a system command with `sudo`.
     # Ensure proper security measures are in place for production environments.
-    # `capture_output=True` captures stdout and stderr.
-    # `text=True` decodes stdout/stderr as text.
-    # `check=True` raises CalledProcessError if the command returns a non-zero exit code.
     try:
-        result = subprocess.run(['sudo', '/usr/sbin/ufw', 'status'], capture_output=True, text=True, check=True)
+        # Use numbered output so we can return stable IDs for delete operations
+        result = subprocess.run(
+            ['sudo', '/usr/sbin/ufw', 'status', 'numbered'],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         output = result.stdout
-        
-        parsed_data = {
-            "status": "unknown",
-            "rules": []
-        }
 
+        parsed_data = {"status": "unknown", "rules": []}
         lines = output.strip().split('\n')
 
         # Parse UFW status (active/inactive) from the first line of the output.
+        if not lines:
+            return parsed_data
         status_match = re.match(r"Status: (active|inactive)", lines[0])
         if status_match:
             parsed_data["status"] = status_match.group(1)
         else:
-            # If status cannot be parsed, return the default parsed_data.
             return parsed_data
 
         if parsed_data["status"] == "inactive":
-            # If UFW is inactive, there are no rules to parse.
             return parsed_data
 
-        # Find the header and separator lines for rules.
-        # The header line contains "To", "Action", "From".
-        # The separator line consists of hyphens.
-        header_line_index = -1
-        separator_line_index = -1
-
-        for i, line in enumerate(lines):
-            if "To" in line and "Action" in line and "From" in line and header_line_index == -1:
-                header_line_index = i
-            elif re.match(r"^-+\s+-+\s+-+$", line) and separator_line_index == -1:
-                separator_line_index = i
-
-        if header_line_index == -1 or separator_line_index == -1:
-            # If header or separator lines are not found, rules cannot be parsed.
-            return parsed_data
-
-        # Extract headers by splitting the header line by two or more spaces.
-        header_line = lines[header_line_index]
-        headers = [h.strip() for h in re.split(r'\s{2,}', header_line) if h.strip()]
-
-        # Parse rules from the lines following the separator.
-        for i in range(separator_line_index + 1, len(lines)):
-            line = lines[i].strip()
-            if not line:
+        # Iterate over lines that look like "[ 1] ..."
+        for line in lines:
+            m = re.match(r"^\[\s*(\d+)\]\s+(.*)$", line)
+            if not m:
+                continue
+            rule_id = int(m.group(1))
+            rest = m.group(2).rstrip()
+            parts = re.split(r"\s{2,}", rest)
+            if len(parts) < 2:
                 continue
 
-            # Split each rule line by two or more spaces.
-            parts = re.split(r'\s{2,}', line.strip())
-            
-            rule = {}
-            # Handle different formats of UFW rule output.
-            if len(parts) >= 3:
-                rule[headers[0]] = parts[0] # To
-                rule[headers[1]] = parts[1] # Action
-                rule[headers[2]] = parts[2] # From
-                parsed_data["rules"].append(rule)
-            elif len(parts) == 2:
-                # Special handling for rules with 'IN' or 'OUT' in the second part.
-                if 'IN' in parts[1] or 'OUT' in parts[1]:
-                    action_parts = parts[1].split(' ', 1)
-                    rule[headers[0]] = parts[0]
-                    rule[headers[1]] = action_parts[0]
-                    if len(action_parts) > 1:
-                        rule[headers[2]] = action_parts[1]
-                    else:
-                        rule[headers[2]] = "" # No 'From' specified
-                    parsed_data["rules"].append(rule)
-                else:
-                    # Assume 'From' is empty if not explicitly present.
-                    rule[headers[0]] = parts[0]
-                    rule[headers[1]] = parts[1]
-                    rule[headers[2]] = "" 
-                    parsed_data["rules"].append(rule)
+            to_field = parts[0].strip()
+            action_field = parts[1].strip()
+            from_field = parts[2].strip() if len(parts) > 2 else ""
+
+            # Extract direction if present in action field (e.g., "ALLOW IN")
+            direction = ""
+            action_tokens = action_field.split()
+            if len(action_tokens) >= 2 and action_tokens[-1] in ("IN", "OUT"):
+                direction = action_tokens[-1]
+                action = " ".join(action_tokens[:-1]).upper()
             else:
-                pass # Skip lines that don't match expected rule format.
+                action = action_field.upper()
+
+            parsed_data["rules"].append({
+                "id": rule_id,
+                "to": to_field,
+                "action": action,
+                "direction": direction,
+                "from": from_field,
+            })
+
         return parsed_data
 
     except FileNotFoundError:

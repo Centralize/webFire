@@ -1,13 +1,43 @@
 <template>
-  <nav class="bg-gray-800 p-4 text-white">
-    <div class="container mx-auto flex justify-between items-center">
-      <router-link to="/" class="text-xl font-bold">webFire</router-link>
-      <div>
-        <router-link to="/status" class="px-3 py-2 rounded hover:bg-gray-700">Status</router-link>
-        <router-link to="/rules" class="px-3 py-2 rounded hover:bg-gray-700 ml-4">Rules</router-link>
-        <router-link to="/settings" class="px-3 py-2 rounded hover:bg-gray-700 ml-4">Settings</router-link>
-        <button @click="authStore.logout()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">
-          Logout
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <div class="container">
+      <router-link to="/" class="navbar-brand fw-bold">
+        <i class="bi bi-shield-check me-2"></i>
+        webFire
+      </router-link>
+      
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <router-link to="/status" class="nav-link">
+              <i class="bi bi-activity me-1"></i>Status
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/rules" class="nav-link">
+              <i class="bi bi-list-ul me-1"></i>Rules
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/settings" class="nav-link">
+              <i class="bi bi-gear me-1"></i>Settings
+            </router-link>
+          </li>
+        </ul>
+        <button @click="authStore.logout()" class="btn btn-outline-danger">
+          <i class="bi bi-box-arrow-right me-1"></i>Logout
         </button>
       </div>
     </div>

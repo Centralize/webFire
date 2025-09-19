@@ -1,45 +1,98 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
-    <div class="relative p-5 border w-96 shadow-lg rounded-md bg-white">
-      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Add New UFW Rule</h3>
-      <form @submit.prevent="submitForm">
-        <div class="mb-4">
-          <label for="action" class="block text-gray-700 text-sm font-bold mb-2">Action:</label>
-          <select v-model="rule.action" id="action" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="allow">ALLOW</option>
-            <option value="deny">DENY</option>
-            <option value="reject">REJECT</option>
-            <option value="limit">LIMIT</option>
-          </select>
+  <div 
+    v-if="isOpen" 
+    class="modal fade show d-block" 
+    tabindex="-1" 
+    role="dialog"
+    style="background-color: rgba(0,0,0,0.5)"
+  >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle me-2"></i>Add New UFW Rule
+          </h5>
+          <button 
+            type="button" 
+            class="btn-close" 
+            @click="closeModal"
+            aria-label="Close"
+          ></button>
         </div>
-        <div class="mb-4">
-          <label for="port" class="block text-gray-700 text-sm font-bold mb-2">Port:</label>
-          <input v-model="rule.port" type="text" id="port" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 80, 443, 22">
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
+            <div class="mb-3">
+              <label for="action" class="form-label">Action</label>
+              <select v-model="rule.action" id="action" class="form-select">
+                <option value="allow">ALLOW</option>
+                <option value="deny">DENY</option>
+                <option value="reject">REJECT</option>
+                <option value="limit">LIMIT</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="port" class="form-label">Port</label>
+              <input 
+                v-model="rule.port" 
+                type="text" 
+                id="port" 
+                class="form-control" 
+                placeholder="e.g., 80, 443, 22"
+                required
+              >
+              <div class="form-text">Enter a single port or port range</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="protocol" class="form-label">Protocol (optional)</label>
+              <input 
+                v-model="rule.protocol" 
+                type="text" 
+                id="protocol" 
+                class="form-control" 
+                placeholder="e.g., tcp, udp"
+              >
+            </div>
+            
+            <div class="mb-3">
+              <label for="direction" class="form-label">Direction</label>
+              <select v-model="rule.direction" id="direction" class="form-select">
+                <option value="in">IN</option>
+                <option value="out">OUT</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="from_ip" class="form-label">From IP (optional)</label>
+              <input 
+                v-model="rule.from_ip" 
+                type="text" 
+                id="from_ip" 
+                class="form-control" 
+                placeholder="e.g., 192.168.1.1"
+              >
+              <div class="form-text">Leave empty for 'any'</div>
+            </div>
+          </form>
         </div>
-        <div class="mb-4">
-          <label for="protocol" class="block text-gray-700 text-sm font-bold mb-2">Protocol (optional):</label>
-          <input v-model="rule.protocol" type="text" id="protocol" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., tcp, udp">
-        </div>
-        <div class="mb-4">
-          <label for="direction" class="block text-gray-700 text-sm font-bold mb-2">Direction:</label>
-          <select v-model="rule.direction" id="direction" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="in">IN</option>
-            <option value="out">OUT</option>
-          </select>
-        </div>
-        <div class="mb-4">
-          <label for="from_ip" class="block text-gray-700 text-sm font-bold mb-2">From IP (optional, default: any):</label>
-          <input v-model="rule.from_ip" type="text" id="from_ip" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 192.168.1.1">
-        </div>
-        <div class="flex items-center justify-between">
-          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Add Rule
-          </button>
-          <button type="button" @click="closeModal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            @click="closeModal"
+          >
             Cancel
           </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            @click="submitForm"
+          >
+            <i class="bi bi-check-lg me-1"></i>Add Rule
+          </button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -64,7 +117,7 @@ const rule = ref({
 
 const submitForm = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/rules', rule.value);
+    const response = await axios.post('/rules', rule.value);
     if (response.data.status === 'success') {
       alert('Rule added successfully!');
       emit('ruleAdded');

@@ -1,72 +1,122 @@
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">UFW Rules</h1>
-    <button @click="isModalOpen = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
-      Add New Rule
-    </button>
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h2 mb-0">
+            <i class="bi bi-list-ul me-2"></i>UFW Rules
+          </h1>
+          <button 
+            @click="isModalOpen = true" 
+            class="btn btn-primary"
+          >
+            <i class="bi bi-plus-lg me-1"></i>Add New Rule
+          </button>
+        </div>
 
-    <!-- Filter and Search Inputs -->
-    <div class="mb-4 p-4 border rounded shadow-sm bg-gray-50">
-      <h2 class="text-xl font-bold mb-2">Filter and Search Rules</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label for="filterAction" class="block text-gray-700 text-sm font-bold mb-2">Action:</label>
-          <select v-model="filterAction" id="filterAction" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="">All</option>
-            <option value="ALLOW">ALLOW</option>
-            <option value="DENY">DENY</option>
-            <option value="REJECT">REJECT</option>
-            <option value="LIMIT">LIMIT</option>
-          </select>
+        <!-- Filter Card -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-funnel me-2"></i>Filter and Search Rules
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="filterAction" class="form-label">Action</label>
+                <select v-model="filterAction" id="filterAction" class="form-select">
+                  <option value="">All Actions</option>
+                  <option value="ALLOW">ALLOW</option>
+                  <option value="DENY">DENY</option>
+                  <option value="REJECT">REJECT</option>
+                  <option value="LIMIT">LIMIT</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="filterDirection" class="form-label">Direction</label>
+                <select v-model="filterDirection" id="filterDirection" class="form-select">
+                  <option value="">All Directions</option>
+                  <option value="IN">IN</option>
+                  <option value="OUT">OUT</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="searchQuery" class="form-label">Search</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input 
+                    v-model="searchQuery" 
+                    type="text" 
+                    id="searchQuery" 
+                    class="form-control" 
+                    placeholder="Search all fields"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label for="filterDirection" class="block text-gray-700 text-sm font-bold mb-2">Direction:</label>
-          <select v-model="filterDirection" id="filterDirection" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="">All</option>
-            <option value="IN">IN</option>
-            <option value="OUT">OUT</option>
-          </select>
+
+        <!-- Rules Table -->
+        <div v-if="filteredRules.length > 0" class="card">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">To</th>
+                  <th scope="col">Action</th>
+                  <th scope="col">Direction</th>
+                  <th scope="col">From</th>
+                  <th scope="col" class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="rule in filteredRules" :key="rule.id">
+                  <td class="fw-mono">{{ rule.id }}</td>
+                  <td>{{ rule.to }}</td>
+                  <td>
+                    <span 
+                      class="badge" 
+                      :class="getActionBadgeClass(rule.action)"
+                    >
+                      {{ rule.action }}
+                    </span>
+                  </td>
+                  <td>{{ rule.direction }}</td>
+                  <td>{{ rule.from }}</td>
+                  <td class="text-center">
+                    <button 
+                      @click="deleteRule(rule.id)" 
+                      class="btn btn-sm btn-outline-danger"
+                      :title="`Delete rule ${rule.id}`"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div>
-          <label for="searchQuery" class="block text-gray-700 text-sm font-bold mb-2">Search:</label>
-          <input v-model="searchQuery" type="text" id="searchQuery" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Search all fields">
+        
+        <!-- No Results -->
+        <div v-else class="alert alert-info text-center">
+          <i class="bi bi-info-circle me-2"></i>
+          No UFW rules found matching your criteria.
         </div>
       </div>
     </div>
 
-    <div v-if="filteredRules.length > 0" class="overflow-x-auto">
-      <table class="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr>
-            <th class="py-2 px-4 border-b">ID</th>
-            <th class="py-2 px-4 border-b">To</th>
-            <th class="py-2 px-4 border-b">Action</th>
-            <th class="py-2 px-4 border-b">Direction</th>
-            <th class="py-2 px-4 border-b">From</th>
-            <th class="py-2 px-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="rule in filteredRules" :key="rule.id">
-            <td class="py-2 px-4 border-b">{{ rule.id }}</td>
-            <td class="py-2 px-4 border-b">{{ rule.to }}</td>
-            <td class="py-2 px-4 border-b">{{ rule.action }}</td>
-            <td class="py-2 px-4 border-b">{{ rule.direction }}</td>
-            <td class="py-2 px-4 border-b">{{ rule.from }}</td>
-            <td class="py-2 px-4 border-b">
-              <button @click="deleteRule(rule.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-else class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-      <p>No UFW rules found matching your criteria.</p>
-    </div>
-
-    <AddRuleModal :isOpen="isModalOpen" @close="isModalOpen = false" @ruleAdded="fetchUfwRules" />
+    
+    <AddRuleModal 
+      :isOpen="isModalOpen" 
+      @close="isModalOpen = false" 
+      @ruleAdded="fetchUfwRules" 
+    />
   </div>
 </template>
 
@@ -83,7 +133,7 @@ const searchQuery = ref('');
 
 const fetchUfwRules = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/rules');
+    const response = await axios.get('/rules');
     rules.value = response.data.rules;
   } catch (error) {
     console.error('Error fetching UFW rules:', error);
@@ -93,7 +143,7 @@ const fetchUfwRules = async () => {
 const deleteRule = async (ruleId) => {
   if (confirm(`Are you sure you want to delete rule ID ${ruleId}?`)) {
     try {
-      const response = await axios.delete(`http://localhost:8000/api/rules/${ruleId}`);
+      const response = await axios.delete(`/rules/${ruleId}`);
       if (response.data.status === 'success') {
         alert('Rule deleted successfully!');
         fetchUfwRules(); // Refresh the list of rules
@@ -132,6 +182,16 @@ const filteredRules = computed(() => {
 
   return filtered;
 });
+
+const getActionBadgeClass = (action) => {
+  switch (action) {
+    case 'ALLOW': return 'bg-success'
+    case 'DENY': return 'bg-danger' 
+    case 'REJECT': return 'bg-warning'
+    case 'LIMIT': return 'bg-info'
+    default: return 'bg-secondary'
+  }
+}
 
 onMounted(fetchUfwRules);
 </script>

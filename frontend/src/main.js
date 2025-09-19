@@ -7,6 +7,13 @@ import StatusView from './views/StatusView.vue'
 import RulesView from './views/RulesView.vue'
 import SettingsView from './views/SettingsView.vue'
 
+// Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
+
+// Bootstrap JS
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
 import './assets/main.css' // Assuming you have a main.css for global styles
 
 const routes = [

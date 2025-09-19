@@ -13,7 +13,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key") # TODO: Change thi
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Use PBKDF2-SHA256 for wide compatibility (avoids bcrypt backend issues in containers)
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
 class Token(BaseModel):

@@ -10,24 +10,50 @@
       </template>
     </Layout>
   </div>
-  <div v-else class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
-      <h2 class="text-2xl font-bold mb-6 text-center">Login to webFire</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
-          <input v-model="username" type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="admin">
+  <div v-else class="min-vh-100 d-flex align-items-center bg-light">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow">
+            <div class="card-body p-4">
+              <div class="text-center mb-4">
+                <h1 class="h3 fw-bold text-primary">
+                  <i class="bi bi-shield-check me-2"></i>webFire
+                </h1>
+                <p class="text-muted">UFW Management Interface</p>
+              </div>
+              <form @submit.prevent="handleLogin">
+                <div class="form-floating mb-3">
+                  <input 
+                    v-model="username" 
+                    type="text" 
+                    id="username" 
+                    class="form-control" 
+                    placeholder="admin"
+                    required
+                  >
+                  <label for="username">Username</label>
+                </div>
+                <div class="form-floating mb-4">
+                  <input 
+                    v-model="password" 
+                    type="password" 
+                    id="password" 
+                    class="form-control" 
+                    placeholder="Password"
+                    required
+                  >
+                  <label for="password">Password</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>
+                  Sign In
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-        <div class="mb-6">
-          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-          <input v-model="password" type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="secret">
-        </div>
-        <div class="flex items-center justify-between">
-          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Sign In
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>

@@ -3,10 +3,11 @@ from main import app
 
 client = TestClient(app)
 
-def test_read_root():
+def test_health_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Hello": "World"}
+    data = response.json()
+    assert data.get("status") == "ok"
 
 def test_login_for_access_token():
     response = client.post(

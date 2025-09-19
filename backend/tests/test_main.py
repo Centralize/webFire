@@ -5,7 +5,8 @@ from main import app
 client = TestClient(app)
 
 
-def test_read_main():
+def test_health_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Hello": "World"}
+    data = response.json()
+    assert data.get("status") == "ok"

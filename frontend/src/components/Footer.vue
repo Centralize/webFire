@@ -1,7 +1,9 @@
 <template>
-  <footer class="bg-gray-800 p-4 text-white text-center">
-    <div class="container mx-auto">
-      <p>&copy; {{ currentYear }} webFire. All rights reserved.</p>
+  <footer class="bg-dark text-white text-center py-3">
+    <div class="container">
+      <small class="text-muted">
+        &copy; {{ currentYear }} webFire. All rights reserved.
+      </small>
     </div>
   </footer>
 </template>

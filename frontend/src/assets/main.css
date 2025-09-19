@@ -1,5 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Custom Bootstrap overrides and additional styles */
 
-/* Add any global styles here */
+:root {
+  --bs-primary: #0066cc;
+  --bs-primary-rgb: 0, 102, 204;
+}
+
+/* Font utilities */
+.fw-mono {
+  font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace;
+}
+
+/* Custom component styles */
+.navbar-brand {
+  font-weight: 700;
+}
+
+.card {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Router link active styles for navigation */
+.nav-link.router-link-active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+}
+
+/* Custom alert styles */
+.alert {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+/* Loading spinner center */
+.spinner-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
