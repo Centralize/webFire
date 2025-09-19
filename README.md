@@ -1,88 +1,140 @@
 # webFire
 
-A modern, intuitive, and easy-to-use web-based user interface for managing the Uncomplicated Firewall (UFW).
+Modern, web-based management for UFW (Uncomplicated Firewall) with a FastAPI backend and a Vue 3 UI, packaged behind Nginx.
 
-## Features
+## Highlights
 
-*   Simplified UFW rule management (add, delete, modify)
-*   Real-time firewall status and active rule display
-*   User-friendly and responsive design
-*   Accessible from any web browser
+- UFW status and rules at a glance
+- Add, delete, and filter rules with stable rule IDs
+- JWT-protected API with a simple dev login
+- Dockerized stack with Nginx reverse proxy
 
-## Technology Stack
+## Architecture
 
-*   **Backend:** Python 3, FastAPI
-*   **Frontend:** Vue.js, Vite, Tailwind CSS
-*   **Containerization:** Docker, Docker Compose
-*   **Web Server:** Nginx
+- Backend: FastAPI (`backend/`) exposes `/api/*` endpoints and Swagger at `/docs`
+- Frontend: Vue 3 + Vite (`frontend/`) builds to static assets served by Nginx
+- Web server: Nginx (`nginx/`) serves the SPA and proxies `/api` to the backend
+- Compose: `docker-compose.yml` builds all services and stitches them together
 
-## Getting Started
+Default ports (compose):
+- `http://localhost:4280` → Nginx (frontend + API proxy)
+- `http://localhost:4200` → Backend (debug access; not needed in normal use)
 
-To get webFire up and running on your local machine, please refer to the detailed installation and setup guide:
+See the full installation walkthrough in docs/INSTALLATION.md.
 
-➡️ [**INSTALLATION.md**](./docs/INSTALLATION.md)
+## Quick Start
+
+Run the full stack via Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Then open `http://localhost:4280`.
+
+Authentication (development):
+- Username: `admin`
+- Password: `secret`
+
+Change `SECRET_KEY` and credentials before any real deployment.
+
+## API Overview
+
+Base path: `/api`
+
+- Auth: `POST /api/token` (form fields `username`, `password`)
+- Status: `GET /api/status`
+- Rules: `GET /api/rules`
+- Add Rule: `POST /api/rules` (JSON body)
+- Delete Rule: `DELETE /api/rules/{id}`
+- Enable UFW: `POST /api/enable`
+- Disable UFW: `POST /api/disable`
+
+OpenAPI docs: `/docs` and `/redoc` (proxied by Nginx)
+
+Example: fetch a token with curl
+
+```bash
+curl -s -X POST \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'username=admin&password=secret' \
+  http://localhost:4280/api/token
+```
+
+## Development
+
+You can use Docker (recommended) or run services locally.
+
+### Backend (local)
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Environment variables:
+- `SECRET_KEY` (required for JWT; defaults to an insecure value in dev)
+
+### Frontend (local)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+By default the frontend calls `/api` (behind Nginx). To point the UI at a locally running backend, set:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000/api npm run dev
+```
+
+## Security and Privileges
+
+- The backend executes `ufw` via `sudo` and the compose grants `NET_ADMIN`/`NET_RAW` to the container.
+- Out of the box, UFW commands affect the container namespace. To manage the host firewall, use the provided host networking override and proceed with caution.
+- Change `SECRET_KEY` and harden authentication before exposing to untrusted networks.
+
+Related docs: docs/INSTALLATION.md and scripts/configure_ufw_for_docker.sh.
 
 ## Project Structure
 
 ```
 webFire/
-├── backend/              # FastAPI backend application
-├── frontend/             # Vue.js frontend application
-├── docs/                 # Project documentation
-│   └── INSTALLATION.md   # Installation and setup guide
-├── nginx/                # Nginx configuration for reverse proxy
-├── docker-compose.yml    # Docker Compose configuration
-└── README.md             # This file
+├── backend/                  FastAPI app and UFW service
+│   ├── main.py               API endpoints, auth, CORS
+│   ├── ufw_service.py        UFW status/rules and operations
+│   ├── auth.py               JWT + password hashing helpers
+│   ├── tests/                API and service tests
+│   └── Dockerfile            Backend image (installs ufw)
+├── frontend/                 Vue 3 app
+│   ├── src/                  Views, components, stores, axios client
+│   └── Dockerfile            Frontend build image
+├── nginx/                    Reverse proxy configs
+├── scripts/                  Utility scripts (e.g., UFW + Docker)
+├── docker-compose.yml        Default stack (Nginx + API + UI)
+├── docker-compose.hostnet.yml Host-network override (advanced)
+└── docs/INSTALLATION.md      Detailed setup guide
 ```
-
-## Development
-
-For development purposes, you can run the services using Docker Compose as described in `INSTALLATION.md`. If you need to run the backend or frontend separately for debugging or specific development workflows:
-
-### Backend Development
-
-1.  Navigate to the `backend/` directory.
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  Run the FastAPI application:
-    ```bash
-    uvicorn main:app --reload --host 0.0.0.0 --port 8000
-    ```
-    The API will be available at `http://localhost:8000`.
-
-### Frontend Development
-
-1.  Navigate to the `frontend/` directory.
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Run the Vue.js development server:
-    ```bash
-    npm run dev
-    ```
-    The frontend will typically be available at `http://localhost:5173` (or another port as indicated by Vite).
 
 ## Testing
 
-### Backend Tests
+Backend tests use pytest and FastAPI’s TestClient:
 
-1.  Navigate to the `backend/` directory.
-2.  Run pytest:
-    ```bash
-    pytest
-    ```
+```bash
+cd backend
+pytest
+```
 
-### Frontend Tests
-
-(Currently, no dedicated frontend tests are set up. This is a future enhancement.)
+Frontend currently has no automated tests. Contributions welcome.
 
 ## Contributing
 
-We welcome contributions to webFire! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) for guidelines on how to contribute.
+Issues and PRs are welcome. Please propose changes with clear rationale and, when possible, tests.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details (coming soon).
+Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+See `LICENSE.md` for full text. By contributing, you agree to license
+your contributions under the AGPL-3.0.

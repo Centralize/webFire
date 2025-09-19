@@ -17,3 +17,4 @@ const currentYear = ref(new Date().getFullYear());
 <style scoped>
 /* Add any specific styles for the footer here */
 </style>
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->

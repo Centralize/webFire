@@ -1,3 +1,4 @@
+# (C) 2025 by OPNLAB Development. All rights reserved.
 import unittest
 from unittest.mock import patch, MagicMock
 

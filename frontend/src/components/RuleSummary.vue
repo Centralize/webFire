@@ -50,3 +50,4 @@ const denyRulesCount = computed(() => {
 <style scoped>
 /* Add any specific styles for the rule summary here */
 </style>
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->

@@ -1,3 +1,4 @@
+// (C) 2025 by OPNLAB Development. All rights reserved.
 import { defineStore } from 'pinia';
 import axios from '../api/axios';
 

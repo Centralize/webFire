@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# (C) 2025 by OPNLAB Development. All rights reserved.
 set -euo pipefail
 
 # Configure UFW to play nicely with Docker by adjusting forward policy
@@ -74,4 +75,3 @@ fi
 echo "Reloading UFW..."
 ufw reload || true
 echo "Done. Verify with: ufw status verbose && cat /etc/ufw/after.rules | sed -n '/BEGIN UFW-DOCKER/,/END UFW-DOCKER/p'"
-

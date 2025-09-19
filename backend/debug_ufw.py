@@ -1,3 +1,4 @@
+"""(C) 2025 by OPNLAB Development. All rights reserved."""
 from ufw_service import get_ufw_rules
 
 if __name__ == "__main__":

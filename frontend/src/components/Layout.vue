@@ -19,3 +19,4 @@
 <style scoped>
 /* Basic styling for layout */
 </style>
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->

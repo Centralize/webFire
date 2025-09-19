@@ -1,3 +1,4 @@
+# (C) 2025 by OPNLAB Development. All rights reserved.
 from fastapi.testclient import TestClient
 
 from main import app

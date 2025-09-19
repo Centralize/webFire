@@ -147,3 +147,4 @@ const closeModal = () => {
 <style scoped>
 /* Add any specific styles for the modal here */
 </style>
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->

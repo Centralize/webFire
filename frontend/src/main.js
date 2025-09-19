@@ -1,3 +1,4 @@
+// (C) 2025 by OPNLAB Development. All rights reserved.
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia' // Import createPinia

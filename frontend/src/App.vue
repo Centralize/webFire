@@ -1,3 +1,4 @@
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->
 <template>
   <div v-if="authStore.isAuthenticated">
     <Layout>

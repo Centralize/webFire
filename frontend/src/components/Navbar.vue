@@ -53,3 +53,4 @@ const authStore = useAuthStore();
 <style scoped>
 /* Add any specific styles for the navbar here */
 </style>
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->

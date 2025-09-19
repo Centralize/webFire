@@ -1,3 +1,4 @@
+"""(C) 2025 by OPNLAB Development. All rights reserved."""
 from datetime import timedelta
 from typing import Optional, List
 

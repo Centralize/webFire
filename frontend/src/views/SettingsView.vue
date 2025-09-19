@@ -1,3 +1,4 @@
+<!-- (C) 2025 by OPNLAB Development. All rights reserved. -->
 <template>
   <div class="container py-4">
     <div class="row">
